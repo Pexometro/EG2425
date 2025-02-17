@@ -1,0 +1,14 @@
+start: sentence
+
+sentence: signal intervals "."
+
+?signal: "+" -> plus
+       | "-" -> minus
+
+intervals: interval (interval)*
+
+interval: "[" NUMBER ":" NUMBER "]" -> interval
+
+%import common.NUMBER
+%import common.WS
+%ignore WS

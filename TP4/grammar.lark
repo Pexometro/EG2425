@@ -1,0 +1,12 @@
+start : "LISTA" elems "."
+
+elems : elem ("," elem)*
+
+elem : NUM
+     | WORD
+
+NUM : /[0-9]+/
+WORD : /[a-zA-Z]+/
+
+%import common.WS
+%ignore WS

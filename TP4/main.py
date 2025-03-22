@@ -15,7 +15,7 @@ class SomaIntervalosTransformer(Transformer):
     def elems(self, args):
         for arg in args:
             valor = str(arg)
-
+            
             if valor == "inicio":
                 self.c += 1
             elif valor == "fim":

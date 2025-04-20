@@ -1,0 +1,109 @@
+start: (declaration | instruction | function_def)*
+
+// Declarations specify a type and an identifier, optionally with an initial value
+declaration: TYPE IDENTIFIER ("=" atom)? ";"
+
+// Supported types in the language
+TYPE: "Int" | "Set" | "Array" | "Seq" | "Tuple" | "String"
+
+// Instructions can be various statements or function calls
+instruction: attribution
+           | read_stmt
+           | write_stmt
+           | selection
+           | repetition
+           | function_call ";"
+
+// Attribution assigns a value to an identifier
+attribution: IDENTIFIER "=" expression ";"
+
+// Read statement to read input into an identifier
+read_stmt: "READ" IDENTIFIER ";"
+
+// Write statement to output an expression
+write_stmt: "WRITE" expression ";"
+
+// Selection statements include if and case statements
+selection: if_stmt | case_stmt
+
+// If statement with optional else part ("+"" means one or more and "?" means zero or one) 
+if_stmt: "IF" condition "THEN" instruction+ ("ELSE" instruction+)? "ENDIF"
+
+// Case statement with multiple case items
+case_stmt: "CASE" expression "OF" case_item+ "ENDCASE"
+
+// Case item with a literal and associated instructions
+case_item: literal ":" instruction+
+
+// Repetition statements include while, repeat, and for loops
+repetition: while_stmt | repeat_stmt | for_stmt
+
+// While loop
+while_stmt: "WHILE" condition "DO" instruction+ "ENDWHILE"
+
+// Repeat loop
+repeat_stmt: "REPEAT" instruction+ "UNTIL" condition
+
+// For loop with optional step
+for_stmt: "FOR" IDENTIFIER "FROM" expression "TO" expression ("STEP" expression)? "DO" instruction+ "ENDFOR"
+
+// Function definition with parameters and return type
+function_def: "FUNCTION" IDENTIFIER "(" param_list? ")" ":" TYPE instruction+ "ENDFUNCTION"
+
+// List of parameters for a function
+param_list: param ("," param)*
+
+// Parameter with type and identifier
+param: TYPE IDENTIFIER
+
+// Function call with arguments
+function_call: IDENTIFIER "(" arg_list? ")"
+
+// List of arguments for a function call
+arg_list: expression ("," expression)*
+
+// Expressions with terms and operators
+expression: term ((PLUS|MINUS) term)*
+
+// Terms with factors and operators
+term: factor ((MULT|DIV) factor)*
+
+// Factors with atoms and exponentiation
+factor: atom (POWER atom)*
+
+// Atoms can be numbers, strings, identifiers, expressions, function calls, or array accesses
+atom: NUMBER
+    | STRING
+    | IDENTIFIER
+    | "(" expression ")"
+    | function_call
+    | array_access
+
+// Array access with an identifier and index expression
+array_access: IDENTIFIER "[" expression "]"
+
+// Condition with a comparison operator
+condition: expression comparison_op expression
+
+// Supported comparison operators
+comparison_op: "=" | "!=" | "<" | ">" | "<=" | ">="
+
+// Literals can be numbers or strings
+literal: NUMBER | STRING
+
+// Operator tokens
+PLUS: "+"
+MINUS: "-"
+MULT: "*"
+DIV: "/"
+POWER: "^"
+
+// Identifier pattern
+IDENTIFIER: /[a-zA-Z_][a-zA-Z0-9_]*/
+
+// String pattern
+STRING: /"[^"]*"/
+
+%import common.NUMBER
+%import common.WS
+%ignore WS

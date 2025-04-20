@@ -1,0 +1,19 @@
+Int a = 5;
+Int b = 10;
+Array e;
+Int d;
+Int d;
+
+READ c;
+
+IF a < b THEN
+    WRITE "a is less than b";
+    c = a + b;
+    b = a + e;
+ELSE
+    WRITE "a is not less than b";
+ENDIF
+
+WHILE c > 0 DO
+    c = c - 1;
+ENDWHILE

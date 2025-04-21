@@ -17,3 +17,11 @@ ENDIF
 WHILE c > 0 DO
     c = c - 1;
 ENDWHILE
+
+WHILE a > 5 DO
+    a = 4;
+ENDWHILE
+
+IF b > a THEN
+    WRITE "OLA";
+ENDIF

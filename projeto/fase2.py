@@ -110,6 +110,10 @@ class SymbolTable:
 class SymbolTableBuilder(Transformer):
     def __init__(self):
         self.symbol_table = SymbolTable()
+        self.assignment_count = 0
+        self.read_write_count = 0
+        self.conditional_count = 0
+        self.cyclic_count = 0
 
         
     def declaration(self, items):
@@ -139,14 +143,26 @@ class SymbolTableBuilder(Transformer):
         # Inicializa a variável
         self.symbol_table.initialize_symbol(name)
         
+        self.assignment_count += 1 # Increment assignment count
         return items
-    
     
     def atom(self, items):
         token = items[0]
         if isinstance(token, Token) and token.type == "IDENTIFIER":
             self.symbol_table.use_symbol(str(token))
         return items
+    
+    def if_stmt(self, items):
+        self.conditional_count += 1
+        return items
+    
+    def while_stmt(self, items):
+        self.cyclic_count += 1
+        return items
+    
+
+
+    # -----------------------------------------------------------------------
         
         
 
@@ -196,6 +212,11 @@ if __name__ == "__main__":
     print(analysis)
     
     print("----------------------------------")
-    # Meter aqui a travessia da árvore e análise com o SymbolTable
-    # Aqui so tem a arvore
-    print(tree.pretty())
+    
+    # --- INSTRUCTION COUNTS ---
+    print("\n=== Instruction Counts ===")
+    print(f"  Assignments: {builder.assignment_count}")
+    print(f"  Read/Write: {builder.read_write_count}")
+    print(f"  Conditionals: {builder.conditional_count}")
+    print(f"  Cyclic: {builder.cyclic_count}")
+    # --------------------------

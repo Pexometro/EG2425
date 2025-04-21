@@ -1,7 +1,7 @@
 start: (declaration | instruction | function_def)*
 
 // Declarations specify a type and an identifier, optionally with an initial value
-declaration: TYPE IDENTIFIER ("=" atom)? ";"
+declaration: TYPE IDENTIFIER ("=" expression)? ";"
 
 // Supported types in the language
 TYPE: "Int" | "Set" | "Array" | "Seq" | "Tuple" | "String"
@@ -13,6 +13,7 @@ instruction: attribution
            | selection
            | repetition
            | function_call ";"
+           | declaration
 
 // Attribution assigns a value to an identifier
 attribution: IDENTIFIER "=" expression ";"

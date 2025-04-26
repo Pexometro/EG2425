@@ -6,22 +6,10 @@ Int d;
 
 READ c;
 
-IF a < b THEN
-    d = 5;
-ELSE
-    WRITE "a is not less than b";
-ENDIF
-
-WHILE c > 0 DO
-    WRITE "OLA";
-
-ENDWHILE
-
-WHILE a > 5 DO
-    WRITE "OLA";
-
-ENDWHILE
-
-IF b > a THEN
-    WRITE "OLA";
+IF a > 0 THEN
+    WHILE b > 0 DO
+        IF c > 0 THEN
+            WRITE "aninhado";
+        ENDIF
+    ENDWHILE
 ENDIF

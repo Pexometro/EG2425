@@ -116,6 +116,8 @@ class SymbolTableBuilder(Transformer):
         self.conditional_count = 0  # Contagem de instruções condicionais
         self.cyclic_count = 0  # Contagem de instruções cíclicas
         self.declaration_count = 0  # Contagem de declarações
+        self.aninhamentos = 0  # Contagem de aninhamentos
+        self.nivel = 0  # Nível de aninhamento
 
     # Processa declarações de variáveis
     def declaration(self, items):
@@ -152,15 +154,50 @@ class SymbolTableBuilder(Transformer):
             self.symbol_table.use_symbol(str(token))  # Marca o identificador como usado
         return items
 
-    # Processa instruções condicionais (if)
     def if_stmt(self, items):
-        self.conditional_count += 1  # Incrementa a contagem de condicionais
-        return items
+        self.nivel += 1
+        self.conditional_count += 1
+        if self.nivel > 1:
+            self.aninhamentos += 1  # Conta aninhamento
+        result = items
+        self.nivel -= 1
+        return result
 
-    # Processa instruções cíclicas (while)
     def while_stmt(self, items):
-        self.cyclic_count += 1  # Incrementa a contagem de ciclos
-        return items
+        self.nivel += 1
+        self.cyclic_count += 1
+        if self.nivel > 1:
+            self.aninhamentos += 1  # Conta aninhamento
+        result = items
+        self.nivel -= 1
+        return result
+
+    def case_stmt(self, items):
+        self.nivel += 1
+        self.conditional_count += 1
+        if self.nivel > 1:
+            self.aninhamentos += 1
+        result = items
+        self.nivel -= 1
+        return result
+
+    def for_stmt(self, items):
+        self.nivel += 1
+        self.cyclic_count += 1
+        if self.nivel > 1:
+            self.aninhamentos += 1
+        result = items
+        self.nivel -= 1
+        return result
+
+    def repeat_stmt(self, items):
+        self.nivel += 1
+        self.cyclic_count += 1
+        if self.nivel > 1:
+            self.aninhamentos += 1
+        result = items
+        self.nivel -= 1
+        return result
     
     def read_stmt(self, items):
         self.read_write_count += 1
@@ -225,3 +262,4 @@ if __name__ == "__main__":
     print(f"  Read/Write: {builder.read_write_count}")
     print(f"  Conditionals: {builder.conditional_count}")
     print(f"  Cyclic: {builder.cyclic_count}")
+    print(f"  Aninhamentos: {builder.aninhamentos}")

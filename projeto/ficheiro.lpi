@@ -1,25 +1,25 @@
 Int a = 5;
-Int b = 10;
+Int b;
+b = 10;
 Array e;
-Int d;
 Int d;
 
 READ c;
 
 IF a < b THEN
-    WRITE "a is less than b";
-    c = a + b;
-    b = a + e;
+    d = 5;
 ELSE
     WRITE "a is not less than b";
 ENDIF
 
 WHILE c > 0 DO
-    c = c - 1;
+    WRITE "OLA";
+
 ENDWHILE
 
 WHILE a > 5 DO
-    a = 4;
+    WRITE "OLA";
+
 ENDWHILE
 
 IF b > a THEN

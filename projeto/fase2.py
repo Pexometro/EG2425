@@ -2,103 +2,103 @@ from lark import Lark, Visitor, Transformer, Token
 import sys
 import os
 
-# Carregar a gramática
+# Carregar a gramática do arquivo grammar.lark
 with open('grammar.lark', 'r') as f:
     grammar = f.read()
 
-# Criar o parser
+# Criar o parser usando o Earley parser da biblioteca Lark
 parser = Lark(grammar, parser='earley')
 
+# Classe que representa um símbolo na tabela de símbolos
 class Symbol:
     def __init__(self, name, type_spec, line, column, scope="global"):
-        self.name = name
-        self.type = type_spec
-        self.scope = scope
-        self.is_initialized = False
-        self.is_used = False
-        self.is_redeclared = False
-        self.line = line
-        self.column = column
+        self.name = name  # Nome da variável
+        self.type = type_spec  # Tipo da variável (Int, Set, etc.)
+        self.scope = scope  # Escopo da variável (global ou local)
+        self.is_initialized = False  # Indica se a variável foi inicializada
+        self.is_used = False  # Indica se a variável foi usada
+        self.is_redeclared = False  # Indica se a variável foi redeclarada
+        self.line = line  # Linha onde a variável foi declarada
+        self.column = column  # Coluna onde a variável foi declarada
 
+# Classe que gerencia a tabela de símbolos
 class SymbolTable:
     def __init__(self):
-        self.symbols = {}
-        self.current_scope = "global"
-        self.undeclared_symbols = set()
-        
-    def add_symbol(self, name, type_spec, line, column, initialize):
-        key = f"{name}_{self.current_scope}"
-        if key in self.symbols:
-            self.symbols[key].is_redeclared = True
-            return False  # Símbolo já declarado
-        
-        self.symbols[key] = Symbol(name, type_spec, line, column, self.current_scope)
-        
-        if initialize:
-            self.symbols[key].is_initialized = True
-        return True
-    
-    def use_symbol(self, name):
+        self.symbols = {}  # Dicionário de símbolos
+        self.current_scope = "global"  # Escopo atual (inicia como global)
+        self.undeclared_symbols = set()  # Conjunto de símbolos não declarados
 
+    # Adiciona um símbolo à tabela
+    def add_symbol(self, name, type_spec, line, column, initialize):
+        key = f"{name}_{self.current_scope}"  # Chave única baseada no nome e escopo
+        if key in self.symbols:
+            self.symbols[key].is_redeclared = True  # Marca como redeclarado
+            return False  # Retorna falso se já foi declarado
+        
+        # Cria e adiciona o símbolo
+        self.symbols[key] = Symbol(name, type_spec, line, column, self.current_scope)
+        if initialize:
+            self.symbols[key].is_initialized = True  # Marca como inicializado
+        return True
+
+    # Marca um símbolo como usado
+    def use_symbol(self, name):
         key = f"{name}_{self.current_scope}"
         if key in self.symbols:
             self.symbols[key].is_used = True
             return self.symbols[key]
         
+        # Verifica no escopo global se não encontrado no escopo atual
         if self.current_scope != "global":
             key = f"{name}_global"
             if key in self.symbols:
                 self.symbols[key].is_used = True
                 return self.symbols[key]
         
-        return None  # Símbolo não encontrado
-    
+        return None  # Retorna None se o símbolo não foi encontrado
+
+    # Inicializa um símbolo
     def initialize_symbol(self, name):
         symbol = self.use_symbol(name)
         if symbol:
             symbol.is_initialized = True
             return True
         return False
-    
+
+    # Entra em um novo escopo
     def enter_scope(self, scope_name):
         self.current_scope = scope_name
-    
+
+    # Sai do escopo atual e retorna ao global
     def exit_scope(self):
         self.current_scope = "global"
-    
-    def get_analysis(self):
 
-        redeclared = []
-        undeclared = []
-        unused = []
-        uninitialized_but_used = []
+    # Realiza a análise da tabela de símbolos
+    def get_analysis(self):
+        redeclared = []  # Variáveis redeclaradas
+        undeclared = []  # Variáveis não declaradas
+        unused = []  # Variáveis declaradas mas nunca usadas
+        uninitialized_but_used = []  # Variáveis usadas mas não inicializadas
         
-        # ver variaveis não usadas
-        
+        # Itera sobre os símbolos para realizar a análise
         for key, symbol in self.symbols.items():
             if not symbol.is_used:
-                unused.append(symbol)
-                
+                unused.append(symbol)  # Variáveis não usadas
             if not symbol.is_initialized and symbol.is_used:
-                uninitialized_but_used.append(symbol)
-                
-            # Verificar se a variável foi redeclarada
-            if key in self.symbols:
-                if symbol.is_redeclared:
-                    redeclared.append(symbol)
-                
+                uninitialized_but_used.append(symbol)  # Variáveis usadas sem inicialização
+            if symbol.is_redeclared:
+                redeclared.append(symbol)  # Variáveis redeclaradas
         
         return {
             "redeclared": redeclared,
             "undeclared": self.undeclared_symbols,
             "unused": unused,
             "uninitialized_but_used": uninitialized_but_used,
-            "type_counts": self.get_type_counts()
+            "type_counts": self.get_type_counts()  # Contagem por tipo
         }
-        
-    
+
+    # Conta o número de variáveis por tipo
     def get_type_counts(self):
-        # Conta variáveis por tipo
         type_counts = {}
         for symbol in self.symbols.values():
             if symbol.type in type_counts:
@@ -106,65 +106,71 @@ class SymbolTable:
             else:
                 type_counts[symbol.type] = 1
         return type_counts
-    
+
+# Classe que constrói a tabela de símbolos e realiza a contagem de instruções
 class SymbolTableBuilder(Transformer):
     def __init__(self):
         self.symbol_table = SymbolTable()
-        self.assignment_count = 0
-        self.read_write_count = 0
-        self.conditional_count = 0
-        self.cyclic_count = 0
+        self.assignment_count = 0  # Contagem de atribuições
+        self.read_write_count = 0  # Contagem de instruções de leitura/escrita
+        self.conditional_count = 0  # Contagem de instruções condicionais
+        self.cyclic_count = 0  # Contagem de instruções cíclicas
+        self.declaration_count = 0  # Contagem de declarações
 
-        
+    # Processa declarações de variáveis
     def declaration(self, items):
+        type_spec = str(items[0])  # Tipo da variável
+        name = str(items[1])  # Nome da variável
+        initialize = True if len(items) > 2 else False  # Verifica se foi inicializada
+        line = items[1].line  # Linha da declaração
+        column = items[1].column  # Coluna da declaração
         
-        type_spec = str(items[0])
-        print(f"Tipo: {type_spec}")
-        name = str(items[1])
-        initialize = True if len(items) > 2 else False
-        
-        line = items[1].line
-        column = items[1].column
-        
+        # Adiciona o símbolo à tabela
         self.symbol_table.add_symbol(name, type_spec, line, column, initialize)
-        
+        self.declaration_count += 1  # Incrementa a contagem de declarações
         return items
-    
+
+    # Processa atribuições
     def attribution(self, items):
-        name = str(items[0])
-        value = items[1]
+        name = str(items[0])  # Nome da variável
+        value = items[1]  # Valor atribuído
         
         # Verifica se a variável foi declarada
         if not self.symbol_table.use_symbol(name):
             self.symbol_table.undeclared_symbols.add((name, items[0].line, items[0].column))
-           
             return items
         
         # Inicializa a variável
         self.symbol_table.initialize_symbol(name)
-        
-        self.assignment_count += 1 # Increment assignment count
+        self.assignment_count += 1  # Incrementa a contagem de atribuições
         return items
-    
+
+    # Processa átomos (identificadores, números, etc.)
     def atom(self, items):
         token = items[0]
         if isinstance(token, Token) and token.type == "IDENTIFIER":
-            self.symbol_table.use_symbol(str(token))
+            self.symbol_table.use_symbol(str(token))  # Marca o identificador como usado
         return items
-    
+
+    # Processa instruções condicionais (if)
     def if_stmt(self, items):
-        self.conditional_count += 1
+        self.conditional_count += 1  # Incrementa a contagem de condicionais
         return items
-    
+
+    # Processa instruções cíclicas (while)
     def while_stmt(self, items):
-        self.cyclic_count += 1
+        self.cyclic_count += 1  # Incrementa a contagem de ciclos
         return items
     
+    def read_stmt(self, items):
+        self.read_write_count += 1
+        return items
+    
+    def write_stmt(self, items):
+        self.read_write_count += 1
+        return items
 
-
-    # -----------------------------------------------------------------------
-        
-        
+# -----------------------------------------------------------------------
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
@@ -175,18 +181,19 @@ if __name__ == "__main__":
     with open(filename, 'r') as f:
         code = f.read()
 
+    # Faz o parsing do código
     tree = parser.parse(code)
     
+    # Constrói a tabela de símbolos e realiza a transformação
     builder = SymbolTableBuilder()
     builder.transform(tree)
 
+    # Exibe a tabela de símbolos
     print(f"tabela de simbolos:\n")
-    # Exibir os símbolos na tabela
-    
-    
     for simb in builder.symbol_table.symbols.values():
         print(f"Nome: {simb.name}, Tipo: {simb.type}, Escopo: {simb.scope}, Inicializado: {simb.is_initialized}, Usado: {simb.is_used}")
     
+    # Realiza a análise e exibe os resultados
     analysis = builder.symbol_table.get_analysis()
     print("=== Análise ===")
     print("Variáveis redeclaradas:")
@@ -209,14 +216,12 @@ if __name__ == "__main__":
     for type_spec, count in analysis["type_counts"].items():
         print(f"  {type_spec}: {count}")
 
-    print(analysis)
-    
     print("----------------------------------")
     
-    # --- INSTRUCTION COUNTS ---
+    # Exibe as contagens de instruções
     print("\n=== Instruction Counts ===")
+    print(f"  Declarations: {builder.declaration_count}")
     print(f"  Assignments: {builder.assignment_count}")
     print(f"  Read/Write: {builder.read_write_count}")
     print(f"  Conditionals: {builder.conditional_count}")
     print(f"  Cyclic: {builder.cyclic_count}")
-    # --------------------------

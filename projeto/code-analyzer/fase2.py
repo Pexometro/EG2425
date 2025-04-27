@@ -1,6 +1,7 @@
 from lark import Lark, Visitor, Transformer, Token
 import sys
 import os
+import json
 
 # Carregar a gramática do arquivo grammar.lark
 with open('grammar.lark', 'r') as f:
@@ -263,3 +264,52 @@ if __name__ == "__main__":
     print(f"  Conditionals: {builder.conditional_count}")
     print(f"  Cyclic: {builder.cyclic_count}")
     print(f"  Aninhamentos: {builder.aninhamentos}")
+    
+    
+    
+if "--json" in sys.argv:
+    # Create a JSON-friendly structure
+    json_result = {
+        "symbols": [
+            {
+                "name": simb.name,
+                "type": simb.type,
+                "scope": simb.scope,
+                "isInitialized": simb.is_initialized,
+                "isUsed": simb.is_used,
+                "isRedeclared": simb.is_redeclared,
+                "line": simb.line,
+                "column": simb.column
+            }
+            for simb in builder.symbol_table.symbols.values()
+        ],
+        "analysis": {
+            "redeclared": [
+                {
+                    "name": var.name,
+                    "line": var.line,
+                    "column": var.column
+                }
+                for var in analysis["redeclared"]
+            ],
+            "undeclared": [
+                {
+                    "name": var[0],
+                    "line": var[1],
+                    "column": var[2]
+                }
+                for var in analysis["undeclared"]
+            ],
+            # Add other analysis results...
+        },
+        "counts": {
+            "declarations": builder.declaration_count,
+            "assignments": builder.assignment_count,
+            "readWrite": builder.read_write_count,
+            "conditionals": builder.conditional_count,
+            "cyclic": builder.cyclic_count,
+            "nestings": builder.aninhamentos
+        },
+        "typeCounts": analysis["type_counts"]
+    }
+    print(json.dumps(json_result))

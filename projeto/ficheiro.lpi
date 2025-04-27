@@ -9,7 +9,9 @@ READ c;
 IF a > 0 THEN
     WHILE b > 0 DO
         IF c > 0 THEN
-            WRITE "aninhado";
+            IF b > 0 THEN
+                WRITE "aninhado";
+            ENDIF
         ENDIF
     ENDWHILE
 ENDIF

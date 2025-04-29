@@ -202,32 +202,26 @@ class NestingCounter(Visitor):
 
 class IfsSimples(Visitor):
     def __init__(self):
-        self.otimizavel = 0
+        self.otimizavel = 0 
 
     def if_stmt(self, tree):
-        instruction = tree.children[1] 
-        print("code",instruction.data, len(instruction.children))
-        if len(instruction.children) > 1:
+        if len(tree.children) < 2:
+            print("MENOR QUE 2")
+            return
+
+        print("code", tree.data, len(tree.children))
+        pa = tree.children[1] 
+        print("code",pa.data, len(pa.children))
+        if len(pa.children) > 1:
             print("MAIOR2 QUE 1")
             return
-        instrution = instruction.children[0]
+        instrution = pa.children[0]
         print("code2", instrution.data, len(instrution.children))
-        if instrution.data == "selection":
-            if_statement = instrution.children[0]
-            print("code4", if_statement.data, len(if_statement.children))
-            print(if_statement.pretty())
-            if len(if_statement.children) > 2:
-                print("MAIOR QUE 2")
-                return 
-            print("code4", if_statement.data, len(if_statement.children))
-            code_block = if_statement.children[1]
-            print("code5", code_block.data, len(code_block.children))
-            if code_block.data == "instruction":
-                print("code6", if_statement.children[1].data)
-                if_child = if_statement.children[1]
-                if if_child.data == "instruction":
-                    print("code7", if_child.children[0].data, len(if_child.children))
-                    print(if_child.pretty())
+        if instrution.data == "instruction":
+            selection = instrution.children[0]
+            if selection.data == "selection":
+                if_statement = selection.children[0]
+                if if_statement.data == "if_stmt":
                     self.otimizavel += 1
                     print("IF SIMPLIFICADO")
 

@@ -9,3 +9,7 @@ IF b > 0 THEN
     WRITE "OLA";
 ENDIF
 
+IF c < a THEN
+    WRITE "nao";
+ENDIF
+

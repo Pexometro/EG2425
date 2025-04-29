@@ -34,7 +34,9 @@ write_stmt: "WRITE" expression ";"
 selection: if_stmt | case_stmt
 
 // If statement with optional else part ("+"" means one or more and "?" means zero or one) 
-if_stmt: "IF" condition "THEN" instruction+ ("ELSE" instruction+)? "ENDIF"
+if_stmt: "IF" condition "THEN" pa ("ELSE" instruction+)? "ENDIF"
+
+pa : instruction+
 
 // Case statement with multiple case items
 case_stmt: "CASE" expression "OF" case_item+ "ENDCASE"

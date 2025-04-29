@@ -1,0 +1,13 @@
+Int i = 0;
+
+WHILE i < 10 DO
+  IF i + 2 = 10 THEN
+    WRITE "Par";
+  ENDIF
+  i = i + 1;
+ENDWHILE
+
+
+IF i = 3 THEN
+    WRITE "Nao aninhado";
+ENDIF

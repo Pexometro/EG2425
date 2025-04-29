@@ -1,0 +1,28 @@
+Int a = 5;
+Int a;
+b = 10;
+Int c;
+WRITEc;
+Int d = 0;
+Set s;
+Tuple t;
+String nome;
+Array lista;
+Seq seq;
+a = 3;
+READ a;
+WRITE a;
+IF a > 0 THEN
+  WRITE "positivo";
+ENDIF
+WHILE a < 5 DO
+  IF a / 2 = 0 THEN
+    WRITE "par";
+  ENDIF
+  a = a + 1;
+ENDWHILE
+IF a > 0 THEN
+  IF a < 10 THEN
+    WRITE "entre 0 e 10";
+  ENDIF
+ENDIF

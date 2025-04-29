@@ -206,24 +206,18 @@ class IfsSimples(Visitor):
 
     def if_stmt(self, tree):
         if len(tree.children) < 2:
-            print("MENOR QUE 2")
             return
 
-        print("code", tree.data, len(tree.children))
         pa = tree.children[1] 
-        print("code",pa.data, len(pa.children))
         if len(pa.children) > 1:
-            print("MAIOR2 QUE 1")
             return
         instrution = pa.children[0]
-        print("code2", instrution.data, len(instrution.children))
         if instrution.data == "instruction":
             selection = instrution.children[0]
             if selection.data == "selection":
                 if_statement = selection.children[0]
                 if if_statement.data == "if_stmt":
                     self.otimizavel += 1
-                    print("IF SIMPLIFICADO")
 
 # -----------------------------------------------
 # Programa principal

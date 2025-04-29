@@ -1,0 +1,12 @@
+Int x = 1;
+
+IF x > 0 THEN
+  IF x < 10 THEN
+    WRITE "Entre 0 e 10";
+  ENDIF
+ENDIF
+
+
+IF x < 0 THEN
+    WRITE "Não simplificavel";
+ENDIF

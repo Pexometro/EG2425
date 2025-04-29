@@ -1,0 +1,12 @@
+Int a;
+a = 5;                      
+READ a;                     
+WRITE a;                    
+
+IF a > 0 THEN               
+  WRITE("positivo");
+ENDIF
+
+WHILE a > 0 DO              
+  a = a - 1;
+ENDWHILE

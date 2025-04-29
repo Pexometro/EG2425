@@ -1,0 +1,6 @@
+Int a;
+Set s;
+Tuple t;
+String nome;
+Array lista;
+Seq seq;

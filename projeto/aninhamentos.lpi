@@ -1,0 +1,17 @@
+Int a = 5;
+Int b;
+b = 10;
+Array e;
+Int d;
+
+READ c;
+
+IF a > 0 THEN
+    IF b > 0 THEN
+        IF e > 0 THEN
+            IF d > 0 THEN
+                WRITE "aninhado";
+            ENDIF
+        ENDIF
+    ENDIF
+ENDIF

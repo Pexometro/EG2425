@@ -1,4 +1,4 @@
-from lark import Lark, Visitor, Transformer, Token
+from lark import Lark, Visitor, Transformer, Token, Tree
 import sys
 import os
 import json
@@ -207,7 +207,100 @@ class SymbolTableBuilder(Transformer):
     def write_stmt(self, items):
         self.read_write_count += 1
         return items
+    
+class ControlStructureCounter(Transformer):
+    def __init__(self):
+        self.nivel = 0
+        self.aninhamentos = 0
 
+    def if_stmt(self, items):
+        self.nivel += 1
+        if self.nivel > 1:
+            self.aninhamentos += 1
+
+        for item in items:
+            if isinstance(item, Tree):
+                if item.data in {"instruction", "selection"}:
+                    self.transform(item)
+
+        self.nivel -= 1
+        return items
+
+    def while_stmt(self, items):
+        return self.if_stmt(items)
+
+    def for_stmt(self, items):
+        return self.if_stmt(items)
+
+    def repeat_stmt(self, items):
+        return self.if_stmt(items)
+
+    def case_stmt(self, items):
+        return self.if_stmt(items)
+
+    def instruction(self, items):
+        for item in items:
+            if isinstance(item, Tree):
+                if item.data in {"if_stmt", "while_stmt", "for_stmt", "repeat_stmt", "case_stmt", "selection"}:
+                    self.transform(item)
+        return items
+
+    def selection(self, items):
+        for item in items:
+            if isinstance(item, Tree):
+                if item.data == "instruction":
+                    self.transform(item)
+        return items
+
+
+    def while_stmt(self, items):
+        self.nivel += 1
+        if self.nivel > 1:
+            self.aninhamentos += 1
+
+        for item in items:
+            if isinstance(item, Tree) and item.data in {"instruction", "selection"}:
+                self.transform(item)
+
+        self.nivel -= 1
+        return items
+
+    def for_stmt(self, items):
+        self.nivel += 1
+        if self.nivel > 1:
+            self.aninhamentos += 1
+
+        for item in items:
+            if isinstance(item, Tree) and item.data in {"instruction", "selection"}:
+                self.transform(item)
+
+        self.nivel -= 1
+        return items
+
+    def repeat_stmt(self, items):
+        self.nivel += 1
+        if self.nivel > 1:
+            self.aninhamentos += 1
+
+        for item in items:
+            if isinstance(item, Tree) and item.data in {"instruction", "selection"}:
+                self.transform(item)
+
+        self.nivel -= 1
+        return items
+
+    def case_stmt(self, items):
+        self.nivel += 1
+        if self.nivel > 1:
+            self.aninhamentos += 1
+
+        for item in items:
+            if isinstance(item, Tree) and item.data in {"instruction", "selection"}:
+                self.transform(item)
+
+        self.nivel -= 1
+        return items
+        
 # -----------------------------------------------------------------------
 
 if __name__ == "__main__":
@@ -226,6 +319,9 @@ if __name__ == "__main__":
     builder = SymbolTableBuilder()
     builder.transform(tree)
 
+    control_transformer = ControlStructureCounter()
+    control_transformer.transform(tree)
+    
     # Exibe a tabela de símbolos
     print(f"tabela de simbolos:\n")
     for simb in builder.symbol_table.symbols.values():
@@ -263,7 +359,7 @@ if __name__ == "__main__":
     print(f"  Read/Write: {builder.read_write_count}")
     print(f"  Conditionals: {builder.conditional_count}")
     print(f"  Cyclic: {builder.cyclic_count}")
-    print(f"  Aninhamentos: {builder.aninhamentos}")
+    print(f"  Aninhamentos: {control_transformer.aninhamentos}")
     
     
     
@@ -308,7 +404,7 @@ if "--json" in sys.argv:
             "readWrite": builder.read_write_count,
             "conditionals": builder.conditional_count,
             "cyclic": builder.cyclic_count,
-            "nestings": builder.aninhamentos
+            "nestings": control_transformer.aninhamentos
         },
         "typeCounts": analysis["type_counts"]
     }

@@ -14,6 +14,12 @@ instruction: attribution
            | repetition
            | function_call ";"
            | declaration
+           | if_stmt
+           | case_stmt
+           | while_stmt
+           | repeat_stmt
+           | for_stmt
+           | while_stmt
 
 // Attribution assigns a value to an identifier
 attribution: IDENTIFIER "=" expression ";"

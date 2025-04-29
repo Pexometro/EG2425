@@ -1,4 +1,5 @@
-from lark import Lark, Visitor, Transformer, Token
+from lark import Lark, Visitor, Token
+from lark.visitors import Visitor_Recursive
 import sys
 import os
 import json
@@ -10,55 +11,48 @@ with open('grammar.lark', 'r') as f:
 # Criar o parser usando o Earley parser da biblioteca Lark
 parser = Lark(grammar, parser='earley')
 
-# Classe que representa um símbolo na tabela de símbolos
+# -----------------------------------------------
+# Classes de dados
+
 class Symbol:
     def __init__(self, name, type_spec, line, column, scope="global"):
-        self.name = name  # Nome da variável
-        self.type = type_spec  # Tipo da variável (Int, Set, etc.)
-        self.scope = scope  # Escopo da variável (global ou local)
-        self.is_initialized = False  # Indica se a variável foi inicializada
-        self.is_used = False  # Indica se a variável foi usada
-        self.is_redeclared = False  # Indica se a variável foi redeclarada
-        self.line = line  # Linha onde a variável foi declarada
-        self.column = column  # Coluna onde a variável foi declarada
+        self.name = name
+        self.type = type_spec
+        self.scope = scope
+        self.is_initialized = False
+        self.is_used = False
+        self.is_redeclared = False
+        self.line = line
+        self.column = column
 
-# Classe que gerencia a tabela de símbolos
 class SymbolTable:
     def __init__(self):
-        self.symbols = {}  # Dicionário de símbolos
-        self.current_scope = "global"  # Escopo atual (inicia como global)
-        self.undeclared_symbols = set()  # Conjunto de símbolos não declarados
+        self.symbols = {}
+        self.current_scope = "global"
+        self.undeclared_symbols = set()
 
-    # Adiciona um símbolo à tabela
     def add_symbol(self, name, type_spec, line, column, initialize):
-        key = f"{name}_{self.current_scope}"  # Chave única baseada no nome e escopo
+        key = f"{name}_{self.current_scope}"
         if key in self.symbols:
-            self.symbols[key].is_redeclared = True  # Marca como redeclarado
-            return False  # Retorna falso se já foi declarado
-        
-        # Cria e adiciona o símbolo
+            self.symbols[key].is_redeclared = True
+            return False
         self.symbols[key] = Symbol(name, type_spec, line, column, self.current_scope)
         if initialize:
-            self.symbols[key].is_initialized = True  # Marca como inicializado
+            self.symbols[key].is_initialized = True
         return True
 
-    # Marca um símbolo como usado
     def use_symbol(self, name):
         key = f"{name}_{self.current_scope}"
         if key in self.symbols:
             self.symbols[key].is_used = True
             return self.symbols[key]
-        
-        # Verifica no escopo global se não encontrado no escopo atual
         if self.current_scope != "global":
             key = f"{name}_global"
             if key in self.symbols:
                 self.symbols[key].is_used = True
                 return self.symbols[key]
-        
-        return None  # Retorna None se o símbolo não foi encontrado
+        return None
 
-    # Inicializa um símbolo
     def initialize_symbol(self, name):
         symbol = self.use_symbol(name)
         if symbol:
@@ -66,149 +60,179 @@ class SymbolTable:
             return True
         return False
 
-    # Entra em um novo escopo
-    def enter_scope(self, scope_name):
-        self.current_scope = scope_name
-
-    # Sai do escopo atual e retorna ao global
-    def exit_scope(self):
-        self.current_scope = "global"
-
-    # Realiza a análise da tabela de símbolos
     def get_analysis(self):
-        redeclared = []  # Variáveis redeclaradas
-        undeclared = []  # Variáveis não declaradas
-        unused = []  # Variáveis declaradas mas nunca usadas
-        uninitialized_but_used = []  # Variáveis usadas mas não inicializadas
-        
-        # Itera sobre os símbolos para realizar a análise
+        redeclared = []
+        unused = []
+        uninitialized_but_used = []
+
         for key, symbol in self.symbols.items():
             if not symbol.is_used:
-                unused.append(symbol)  # Variáveis não usadas
+                unused.append(symbol)
             if not symbol.is_initialized and symbol.is_used:
-                uninitialized_but_used.append(symbol)  # Variáveis usadas sem inicialização
+                uninitialized_but_used.append(symbol)
             if symbol.is_redeclared:
-                redeclared.append(symbol)  # Variáveis redeclaradas
-        
+                redeclared.append(symbol)
+
         return {
             "redeclared": redeclared,
             "undeclared": self.undeclared_symbols,
             "unused": unused,
             "uninitialized_but_used": uninitialized_but_used,
-            "type_counts": self.get_type_counts()  # Contagem por tipo
+            "type_counts": self.get_type_counts()
         }
 
-    # Conta o número de variáveis por tipo
     def get_type_counts(self):
         type_counts = {}
         for symbol in self.symbols.values():
-            if symbol.type in type_counts:
-                type_counts[symbol.type] += 1
-            else:
-                type_counts[symbol.type] = 1
+            type_counts[symbol.type] = type_counts.get(symbol.type, 0) + 1
         return type_counts
 
-# Classe que constrói a tabela de símbolos e realiza a contagem de instruções
-class SymbolTableBuilder(Transformer):
+# -----------------------------------------------
+# Visitor Principal
+
+class SymbolTableBuilder(Visitor_Recursive):
     def __init__(self):
         self.symbol_table = SymbolTable()
-        self.assignment_count = 0  # Contagem de atribuições
-        self.read_write_count = 0  # Contagem de instruções de leitura/escrita
-        self.conditional_count = 0  # Contagem de instruções condicionais
-        self.cyclic_count = 0  # Contagem de instruções cíclicas
-        self.declaration_count = 0  # Contagem de declarações
-        self.aninhamentos = 0  # Contagem de aninhamentos
-        self.nivel = 0  # Nível de aninhamento
+        self.assignment_count = 0
+        self.read_write_count = 0
+        self.conditional_count = 0
+        self.cyclic_count = 0
+        self.declaration_count = 0
 
-    # Processa declarações de variáveis
-    def declaration(self, items):
-        type_spec = str(items[0])  # Tipo da variável
-        name = str(items[1])  # Nome da variável
-        initialize = True if len(items) > 2 else False  # Verifica se foi inicializada
-        line = items[1].line  # Linha da declaração
-        column = items[1].column  # Coluna da declaração
-        
-        # Adiciona o símbolo à tabela
+    def declaration(self, tree):
+        type_spec = str(tree.children[0])
+        name = str(tree.children[1])
+        initialize = len(tree.children) > 2
+        line = tree.children[1].line
+        column = tree.children[1].column
+
         self.symbol_table.add_symbol(name, type_spec, line, column, initialize)
-        self.declaration_count += 1  # Incrementa a contagem de declarações
-        return items
+        self.declaration_count += 1
 
-    # Processa atribuições
-    def attribution(self, items):
-        name = str(items[0])  # Nome da variável
-        value = items[1]  # Valor atribuído
-        
-        # Verifica se a variável foi declarada
+    def attribution(self, tree):
+        name = str(tree.children[0])
         if not self.symbol_table.use_symbol(name):
-            self.symbol_table.undeclared_symbols.add((name, items[0].line, items[0].column))
-            return items
-        
-        # Inicializa a variável
+            self.symbol_table.undeclared_symbols.add((name, tree.children[0].line, tree.children[0].column))
+            return
         self.symbol_table.initialize_symbol(name)
-        self.assignment_count += 1  # Incrementa a contagem de atribuições
-        return items
+        self.assignment_count += 1
 
-    # Processa átomos (identificadores, números, etc.)
-    def atom(self, items):
-        token = items[0]
+    def atom(self, tree):
+        token = tree.children[0]
         if isinstance(token, Token) and token.type == "IDENTIFIER":
-            self.symbol_table.use_symbol(str(token))  # Marca o identificador como usado
-        return items
-
-    def if_stmt(self, items):
-        self.nivel += 1
-        self.conditional_count += 1
-        if self.nivel > 1:
-            self.aninhamentos += 1  # Conta aninhamento
-        result = items
-        self.nivel -= 1
-        return result
-
-    def while_stmt(self, items):
-        self.nivel += 1
-        self.cyclic_count += 1
-        if self.nivel > 1:
-            self.aninhamentos += 1  # Conta aninhamento
-        result = items
-        self.nivel -= 1
-        return result
-
-    def case_stmt(self, items):
-        self.nivel += 1
-        self.conditional_count += 1
-        if self.nivel > 1:
-            self.aninhamentos += 1
-        result = items
-        self.nivel -= 1
-        return result
-
-    def for_stmt(self, items):
-        self.nivel += 1
-        self.cyclic_count += 1
-        if self.nivel > 1:
-            self.aninhamentos += 1
-        result = items
-        self.nivel -= 1
-        return result
-
-    def repeat_stmt(self, items):
-        self.nivel += 1
-        self.cyclic_count += 1
-        if self.nivel > 1:
-            self.aninhamentos += 1
-        result = items
-        self.nivel -= 1
-        return result
+            self.symbol_table.use_symbol(str(token))
     
-    def read_stmt(self, items):
-        self.read_write_count += 1
-        return items
-    
-    def write_stmt(self, items):
-        self.read_write_count += 1
-        return items
+    def if_stmt(self, tree):
+        self.conditional_count += 1
 
-# -----------------------------------------------------------------------
+    def while_stmt(self, tree):
+        self.cyclic_count += 1
+
+    def for_stmt(self, tree):
+        self.cyclic_count += 1
+
+    def case_stmt(self, tree):
+        self.conditional_count += 1
+
+    def repeat_stmt(self, tree):
+        self.cyclic_count += 1
+
+    def read_stmt(self, tree):
+        self.read_write_count += 1
+
+    def write_stmt(self, tree):
+        self.read_write_count += 1
+
+# -----------------------------------------------
+# Novo Visitor para contar aninhamentos
+
+class NestingCounter(Visitor):
+    def __init__(self):
+        self.control_stack = []
+        self.aninhamentos = 0
+
+    def push(self, tipo):
+        if self.control_stack:
+            self.aninhamentos += 1
+        self.control_stack.append(tipo)
+
+    def pop(self):
+        if self.control_stack:
+            self.control_stack.pop()
+
+    def if_stmt(self, tree):
+        self.push("if")
+        for child in tree.children:
+            if hasattr(child, 'data'):
+                self.visit(child)
+        self.pop()
+
+    def while_stmt(self, tree):
+        self.push("while")
+        for child in tree.children:
+            if hasattr(child, 'data'):
+                self.visit(child)
+        self.pop()
+
+    def for_stmt(self, tree):
+        self.push("for")
+        for child in tree.children:
+            if hasattr(child, 'data'):
+                self.visit(child)
+        self.pop()
+
+    def repeat_stmt(self, tree):
+        self.push("repeat")
+        for child in tree.children:
+            if hasattr(child, 'data'):
+                self.visit(child)
+        self.pop()
+
+    def case_stmt(self, tree):
+        self.push("case")
+        for child in tree.children:
+            if hasattr(child, 'data'):
+                self.visit(child)
+        self.pop()
+
+
+
+# -----------------------------------------------
+#Ifs para ser simplificados 
+
+class IfsSimples(Visitor):
+    def __init__(self):
+        self.otimizavel = 0
+
+    def if_stmt(self, tree):
+        instruction = tree.children[1] 
+        print("code",instruction.data, len(instruction.children))
+        if len(instruction.children) > 1:
+            print("MAIOR2 QUE 1")
+            return
+        instrution = instruction.children[0]
+        print("code2", instrution.data, len(instrution.children))
+        if instrution.data == "selection":
+            if_statement = instrution.children[0]
+            print("code4", if_statement.data, len(if_statement.children))
+            print(if_statement.pretty())
+            if len(if_statement.children) > 2:
+                print("MAIOR QUE 2")
+                return 
+            print("code4", if_statement.data, len(if_statement.children))
+            code_block = if_statement.children[1]
+            print("code5", code_block.data, len(code_block.children))
+            if code_block.data == "instruction":
+                print("code6", if_statement.children[1].data)
+                if_child = if_statement.children[1]
+                if if_child.data == "instruction":
+                    print("code7", if_child.children[0].data, len(if_child.children))
+                    print(if_child.pretty())
+                    self.otimizavel += 1
+                    print("IF SIMPLIFICADO")
+
+# -----------------------------------------------
+# Programa principal
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
@@ -219,97 +243,49 @@ if __name__ == "__main__":
     with open(filename, 'r') as f:
         code = f.read()
 
-    # Faz o parsing do código
     tree = parser.parse(code)
-    
-    # Constrói a tabela de símbolos e realiza a transformação
-    builder = SymbolTableBuilder()
-    builder.transform(tree)
 
-    # Exibe a tabela de símbolos
+    builder = SymbolTableBuilder()
+    builder.visit(tree)
+
+    nesting_counter = NestingCounter()
+    nesting_counter.visit(tree)
+
+    ifs_simples = IfsSimples()
+    ifs_simples.visit(tree)
+
     print(f"tabela de simbolos:\n")
     for simb in builder.symbol_table.symbols.values():
         print(f"Nome: {simb.name}, Tipo: {simb.type}, Escopo: {simb.scope}, Inicializado: {simb.is_initialized}, Usado: {simb.is_used}")
-    
-    # Realiza a análise e exibe os resultados
+
     analysis = builder.symbol_table.get_analysis()
     print("=== Análise ===")
     print("Variáveis redeclaradas:")
     for var in analysis["redeclared"]:
         print(f"  {var.name} (linha {var.line}, coluna {var.column})")
-        
+
     print("Variáveis não declaradas:")
     for var in analysis["undeclared"]:
         print(f"  {var[0]} (linha {var[1]}, coluna {var[2]})")
-        
+
     print("Variáveis não usadas:")
     for var in analysis["unused"]:
         print(f"  {var.name} (linha {var.line}, coluna {var.column})")
-        
+
     print("Variáveis usadas sem inicialização:")
     for var in analysis["uninitialized_but_used"]:
         print(f"  {var.name} (linha {var.line}, coluna {var.column})")
-        
+
     print("Contagem por tipo:")
     for type_spec, count in analysis["type_counts"].items():
         print(f"  {type_spec}: {count}")
 
     print("----------------------------------")
-    
-    # Exibe as contagens de instruções
     print("\n=== Instruction Counts ===")
     print(f"  Declarations: {builder.declaration_count}")
     print(f"  Assignments: {builder.assignment_count}")
     print(f"  Read/Write: {builder.read_write_count}")
     print(f"  Conditionals: {builder.conditional_count}")
     print(f"  Cyclic: {builder.cyclic_count}")
-    print(f"  Aninhamentos: {builder.aninhamentos}")
-    
-    
-    
-if "--json" in sys.argv:
-    # Create a JSON-friendly structure
-    json_result = {
-        "symbols": [
-            {
-                "name": simb.name,
-                "type": simb.type,
-                "scope": simb.scope,
-                "isInitialized": simb.is_initialized,
-                "isUsed": simb.is_used,
-                "isRedeclared": simb.is_redeclared,
-                "line": simb.line,
-                "column": simb.column
-            }
-            for simb in builder.symbol_table.symbols.values()
-        ],
-        "analysis": {
-            "redeclared": [
-                {
-                    "name": var.name,
-                    "line": var.line,
-                    "column": var.column
-                }
-                for var in analysis["redeclared"]
-            ],
-            "undeclared": [
-                {
-                    "name": var[0],
-                    "line": var[1],
-                    "column": var[2]
-                }
-                for var in analysis["undeclared"]
-            ],
-            # Add other analysis results...
-        },
-        "counts": {
-            "declarations": builder.declaration_count,
-            "assignments": builder.assignment_count,
-            "readWrite": builder.read_write_count,
-            "conditionals": builder.conditional_count,
-            "cyclic": builder.cyclic_count,
-            "nestings": builder.aninhamentos
-        },
-        "typeCounts": analysis["type_counts"]
-    }
-    print(json.dumps(json_result))
+    print(f"  Aninhamentos: {nesting_counter.aninhamentos}")
+    print(f"  Ifs simplificavel: {ifs_simples.otimizavel}")

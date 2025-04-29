@@ -1,0 +1,11 @@
+Int b;
+b = 10;
+
+
+IF b > 0 THEN
+    IF a < 0 THEN
+        WRITE "aninhado";
+    ENDIF
+    WRITE "OLA";
+ENDIF
+

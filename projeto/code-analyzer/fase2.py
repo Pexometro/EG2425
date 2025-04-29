@@ -3,6 +3,7 @@ from lark.visitors import Visitor_Recursive
 import sys
 import os
 import json
+from generate_html import generate_html_report
 
 # Carregar a gramática do arquivo grammar.lark
 with open('grammar.lark', 'r') as f:
@@ -242,6 +243,9 @@ if __name__ == "__main__":
     ifs_simples = IfsSimples()
     ifs_simples.visit(tree)
 
+    generate_html_report(code, builder, nesting_counter, ifs_simples)
+
+
     print(f"tabela de simbolos:\n")
     for simb in builder.symbol_table.symbols.values():
         print(f"Nome: {simb.name}, Tipo: {simb.type}, Escopo: {simb.scope}, Inicializado: {simb.is_initialized}, Usado: {simb.is_used}")
@@ -277,3 +281,6 @@ if __name__ == "__main__":
     print(f"  Cyclic: {builder.cyclic_count}")
     print(f"  Aninhamentos: {nesting_counter.aninhamentos}")
     print(f"  Ifs simplificavel: {ifs_simples.otimizavel}")
+
+
+

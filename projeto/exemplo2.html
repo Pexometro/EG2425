@@ -1,0 +1,72 @@
+
+    <html>
+    <head>
+        <title>Relatório de Análise</title>
+        <style>
+            body { background: #111; color: #eee; font-family: monospace; padding: 2em; }
+            h2 { color: #ff00cc; }
+            .section { margin-bottom: 3em; }
+            table { border-collapse: collapse; width: 100%; margin-top: 1em; }
+            th, td { border: 1px solid #444; padding: 8px; text-align: left; }
+            th { background: #222; color: #ff99ff; }
+            .error { color: #ff6666; }
+            .warn { color: #ffcc66; }
+            .if-simp { color: #66ffcc; }
+            pre { background: #1e1e1e; padding: 1em; overflow-x: auto; }
+        </style>
+    </head>
+    <body>
+        <h1>Relatório de Análise de Código</h1>
+
+        <div class="section">
+            <h2>1. Código Fonte</h2>
+            <pre><div class="highlight" style="background: #272822"><pre style="line-height: 125%;"><span></span><span style="color: #F8F8F2">Int</span> <span style="color: #F8F8F2">a;</span>
+<span style="color: #F8F8F2">Set</span> <span style="color: #F8F8F2">s;</span>
+<span style="color: #F8F8F2">Tuple</span> <span style="color: #F8F8F2">t;</span>
+<span style="color: #F8F8F2">String</span> <span style="color: #F8F8F2">nome;</span>
+<span style="color: #F8F8F2">Array</span> <span style="color: #F8F8F2">lista;</span>
+<span style="color: #F8F8F2">Seq</span> <span style="color: #F8F8F2">seq;</span>
+</pre></div>
+</pre>
+        </div>
+
+        <div class="section">
+            <h2>2. Tabela de Símbolos</h2>
+            <table>
+                <tr><th>ID</th><th>Scope</th><th>Type</th></tr>
+    <tr><td>a</td><td>global</td><td>Int</td></tr>
+<tr><td>s</td><td>global</td><td>Set</td></tr>
+<tr><td>t</td><td>global</td><td>Tuple</td></tr>
+<tr><td>nome</td><td>global</td><td>String</td></tr>
+<tr><td>lista</td><td>global</td><td>Array</td></tr>
+<tr><td>seq</td><td>global</td><td>Seq</td></tr>
+
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>3. Contagens</h2>
+            <ul>
+                <li>Declarações: 6</li>
+                <li>Atribuições: 0</li>
+                <li>Leitura/Escrita: 0</li>
+                <li>Condicionais: 0</li>
+                <li>Cíclicas: 0</li>
+                <li>Aninhamentos: 0</li>
+                <li>Ifs simplificáveis: 0</li>
+            </ul>
+        </div>
+    
+        <div class="section">
+            <h2>4. Erros e Warnings</h2>
+    <p class='warn'>[WARNING] Variável a declarada mas não usada (linha 1)</p><p class='warn'>[WARNING] Variável s declarada mas não usada (linha 2)</p><p class='warn'>[WARNING] Variável t declarada mas não usada (linha 3)</p><p class='warn'>[WARNING] Variável nome declarada mas não usada (linha 4)</p><p class='warn'>[WARNING] Variável lista declarada mas não usada (linha 5)</p><p class='warn'>[WARNING] Variável seq declarada mas não usada (linha 6)</p></div><div class='section'><h2>5. Tipos</h2><table><tr><th>Tipo</th><th>Quantidade</th></tr><tr><td>Int</td><td>1</td></tr><tr><td>Set</td><td>1</td></tr><tr><td>Tuple</td><td>1</td></tr><tr><td>String</td><td>1</td></tr><tr><td>Array</td><td>1</td></tr><tr><td>Seq</td><td>1</td></tr></table></div>
+        <div class='section'>
+            <h2>6. Estruturas de Controlo Aninhadas</h2>
+            <p class='if-simp'>Total: 0</p>
+        </div>
+    
+        <div class='section'>
+            <h2>7. IFs simplificáveis</h2>
+            <p class='if-simp'>Total: 0</p>
+        </div>
+    </body></html>

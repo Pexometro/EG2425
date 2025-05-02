@@ -1,0 +1,69 @@
+
+    <html>
+    <head>
+        <title>Relatório de Análise</title>
+        <style>
+            body { background: #111; color: #eee; font-family: monospace; padding: 2em; }
+            h2 { color: #ff00cc; }
+            .section { margin-bottom: 3em; }
+            table { border-collapse: collapse; width: 100%; margin-top: 1em; }
+            th, td { border: 1px solid #444; padding: 8px; text-align: left; }
+            th { background: #222; color: #ff99ff; }
+            .error { color: #ff6666; }
+            .warn { color: #ffcc66; }
+            .if-simp { color: #66ffcc; }
+            pre { background: #1e1e1e; padding: 1em; overflow-x: auto; }
+        </style>
+    </head>
+    <body>
+        <h1>Relatório de Análise de Código</h1>
+
+        <div class="section">
+            <h2>1. Código Fonte</h2>
+            <pre><div class="highlight" style="background: #272822"><pre style="line-height: 125%;"><span></span><span style="color: #F8F8F2">Int</span> <span style="color: #F8F8F2">a</span> <span style="color: #FF4689">=</span> <span style="color: #AE81FF">5</span><span style="color: #F8F8F2">;</span>
+<span style="color: #F8F8F2">Int</span> <span style="color: #F8F8F2">a;</span>              
+<span style="color: #F8F8F2">b</span> <span style="color: #FF4689">=</span> <span style="color: #AE81FF">10</span><span style="color: #F8F8F2">;</span>             
+<span style="color: #F8F8F2">Int</span> <span style="color: #F8F8F2">c;</span>
+<span style="color: #F8F8F2">WRITE(c);</span>           
+<span style="color: #F8F8F2">Int</span> <span style="color: #F8F8F2">d</span> <span style="color: #FF4689">=</span> <span style="color: #AE81FF">0</span><span style="color: #F8F8F2">;</span>          
+</pre></div>
+</pre>
+        </div>
+
+        <div class="section">
+            <h2>2. Tabela de Símbolos</h2>
+            <table>
+                <tr><th>ID</th><th>Scope</th><th>Type</th></tr>
+    <tr><td>a</td><td>global</td><td>Int</td></tr>
+<tr><td>c</td><td>global</td><td>Int</td></tr>
+<tr><td>d</td><td>global</td><td>Int</td></tr>
+
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>3. Contagens</h2>
+            <ul>
+                <li>Declarações: 4</li>
+                <li>Atribuições: 0</li>
+                <li>Leitura/Escrita: 1</li>
+                <li>Condicionais: 0</li>
+                <li>Cíclicas: 0</li>
+                <li>Aninhamentos: 0</li>
+                <li>Ifs simplificáveis: 0</li>
+            </ul>
+        </div>
+    
+        <div class="section">
+            <h2>4. Erros e Warnings</h2>
+    <p class='error'>[ERROR] Variável a redeclarada (linha 1)</p><p class='error'>[ERROR] Variável b não declarada (linha 3)</p><p class='warn'>[WARNING] Variável a declarada mas não usada (linha 1)</p><p class='warn'>[WARNING] Variável d declarada mas não usada (linha 6)</p><p class='warn'>[WARNING] Variável c usada sem inicializar (linha 4)</p></div><div class='section'><h2>5. Tipos</h2><table><tr><th>Tipo</th><th>Quantidade</th></tr><tr><td>Int</td><td>3</td></tr></table></div>
+        <div class='section'>
+            <h2>6. Estruturas de Controlo Aninhadas</h2>
+            <p class='if-simp'>Total: 0</p>
+        </div>
+    
+        <div class='section'>
+            <h2>7. IFs simplificáveis</h2>
+            <p class='if-simp'>Total: 0</p>
+        </div>
+    </body></html>

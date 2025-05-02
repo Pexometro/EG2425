@@ -1,0 +1,108 @@
+
+    <html>
+    <head>
+        <title>Relatório de Análise</title>
+        <style>
+            body { background: #111; color: #eee; font-family: monospace; padding: 2em; }
+            h2 { color: #ff00cc; }
+            .section { margin-bottom: 3em; }
+            table { border-collapse: collapse; width: 100%; margin-top: 1em; }
+            th, td { border: 1px solid #444; padding: 8px; text-align: left; }
+            th { background: #222; color: #ff99ff; }
+            .error { color: #ff6666; }
+            .warn { color: #ffcc66; }
+            .if-simp { color: #66ffcc; }
+            pre { background: #1e1e1e; padding: 1em; overflow-x: auto; }
+        </style>
+    </head>
+    <body>
+        <h1>Relatório de Análise de Código</h1>
+
+        <div class="section">
+            <h2>1. Código Fonte</h2>
+            <pre><div class="highlight" style="background: #272822"><pre style="line-height: 125%;"><span></span><span style="color: #F8F8F2">Int</span> <span style="color: #F8F8F2">a</span> <span style="color: #FF4689">=</span> <span style="color: #AE81FF">5</span><span style="color: #F8F8F2">;</span>
+<span style="color: #F8F8F2">Int</span> <span style="color: #F8F8F2">a;</span>
+
+<span style="color: #F8F8F2">b</span> <span style="color: #FF4689">=</span> <span style="color: #AE81FF">10</span><span style="color: #F8F8F2">;</span>
+
+<span style="color: #F8F8F2">Int</span> <span style="color: #F8F8F2">c;</span>
+<span style="color: #F8F8F2">WRITE</span> <span style="color: #E6DB74">&quot;c&quot;</span><span style="color: #F8F8F2">;</span>
+
+<span style="color: #F8F8F2">Int</span> <span style="color: #F8F8F2">d</span> <span style="color: #FF4689">=</span> <span style="color: #AE81FF">0</span><span style="color: #F8F8F2">;</span>
+
+<span style="color: #F8F8F2">Set</span> <span style="color: #F8F8F2">s;</span>
+
+<span style="color: #F8F8F2">Tuple</span> <span style="color: #F8F8F2">t;</span>
+
+<span style="color: #F8F8F2">String</span> <span style="color: #F8F8F2">nome;</span>
+
+<span style="color: #F8F8F2">Array</span> <span style="color: #F8F8F2">lista;</span>
+
+<span style="color: #F8F8F2">Seq</span> <span style="color: #F8F8F2">seq;</span>
+
+<span style="color: #F8F8F2">a</span> <span style="color: #FF4689">=</span> <span style="color: #AE81FF">3</span><span style="color: #F8F8F2">;</span>
+<span style="color: #F8F8F2">READ</span> <span style="color: #F8F8F2">a;</span>
+<span style="color: #F8F8F2">WRITE</span> <span style="color: #F8F8F2">a;</span>
+
+<span style="color: #F8F8F2">IF</span> <span style="color: #F8F8F2">a</span> <span style="color: #FF4689">&gt;</span> <span style="color: #AE81FF">0</span> <span style="color: #F8F8F2">THEN</span>
+  <span style="color: #F8F8F2">WRITE</span> <span style="color: #E6DB74">&quot;positivo&quot;</span><span style="color: #F8F8F2">;</span>
+<span style="color: #F8F8F2">ENDIF</span>
+
+<span style="color: #F8F8F2">WHILE</span> <span style="color: #F8F8F2">a</span> <span style="color: #FF4689">&lt;</span> <span style="color: #AE81FF">5</span> <span style="color: #F8F8F2">DO</span>
+  <span style="color: #F8F8F2">IF</span> <span style="color: #F8F8F2">a</span> <span style="color: #FF4689">/</span> <span style="color: #AE81FF">2</span> <span style="color: #FF4689">=</span> <span style="color: #AE81FF">0</span> <span style="color: #F8F8F2">THEN</span>
+    <span style="color: #F8F8F2">WRITE</span> <span style="color: #E6DB74">&quot;par&quot;</span><span style="color: #F8F8F2">;</span>
+  <span style="color: #F8F8F2">ENDIF</span>
+  <span style="color: #F8F8F2">a</span> <span style="color: #FF4689">=</span> <span style="color: #F8F8F2">a</span> <span style="color: #FF4689">+</span> <span style="color: #AE81FF">1</span><span style="color: #F8F8F2">;</span>
+<span style="color: #F8F8F2">ENDWHILE</span>
+
+<span style="color: #F8F8F2">IF</span> <span style="color: #F8F8F2">a</span> <span style="color: #FF4689">&gt;</span> <span style="color: #AE81FF">0</span> <span style="color: #F8F8F2">THEN</span>
+  <span style="color: #F8F8F2">IF</span> <span style="color: #F8F8F2">a</span> <span style="color: #FF4689">&lt;</span> <span style="color: #AE81FF">10</span> <span style="color: #F8F8F2">THEN</span>
+    <span style="color: #F8F8F2">WRITE</span> <span style="color: #E6DB74">&quot;entre 0 e 10&quot;</span><span style="color: #F8F8F2">;</span>
+  <span style="color: #F8F8F2">ENDIF</span>
+<span style="color: #F8F8F2">ENDIF</span>
+</pre></div>
+</pre>
+        </div>
+
+        <div class="section">
+            <h2>2. Tabela de Símbolos</h2>
+            <table>
+                <tr><th>ID</th><th>Scope</th><th>Type</th></tr>
+    <tr><td>a</td><td>global</td><td>Int</td></tr>
+<tr><td>c</td><td>global</td><td>Int</td></tr>
+<tr><td>d</td><td>global</td><td>Int</td></tr>
+<tr><td>s</td><td>global</td><td>Set</td></tr>
+<tr><td>t</td><td>global</td><td>Tuple</td></tr>
+<tr><td>nome</td><td>global</td><td>String</td></tr>
+<tr><td>lista</td><td>global</td><td>Array</td></tr>
+<tr><td>seq</td><td>global</td><td>Seq</td></tr>
+
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>3. Contagens</h2>
+            <ul>
+                <li>Declarações: 9</li>
+                <li>Atribuições: 2</li>
+                <li>Leitura/Escrita: 6</li>
+                <li>Condicionais: 4</li>
+                <li>Cíclicas: 1</li>
+                <li>Aninhamentos: 2</li>
+                <li>Ifs simplificáveis: 1</li>
+            </ul>
+        </div>
+    
+        <div class="section">
+            <h2>4. Erros e Warnings</h2>
+    <p class='error'>[ERROR] Variável a redeclarada (linha 1)</p><p class='error'>[ERROR] Variável b não declarada (linha 4)</p><p class='warn'>[WARNING] Variável c declarada mas não usada (linha 6)</p><p class='warn'>[WARNING] Variável d declarada mas não usada (linha 9)</p><p class='warn'>[WARNING] Variável s declarada mas não usada (linha 11)</p><p class='warn'>[WARNING] Variável t declarada mas não usada (linha 13)</p><p class='warn'>[WARNING] Variável nome declarada mas não usada (linha 15)</p><p class='warn'>[WARNING] Variável lista declarada mas não usada (linha 17)</p><p class='warn'>[WARNING] Variável seq declarada mas não usada (linha 19)</p></div><div class='section'><h2>5. Tipos</h2><table><tr><th>Tipo</th><th>Quantidade</th></tr><tr><td>Int</td><td>3</td></tr><tr><td>Set</td><td>1</td></tr><tr><td>Tuple</td><td>1</td></tr><tr><td>String</td><td>1</td></tr><tr><td>Array</td><td>1</td></tr><tr><td>Seq</td><td>1</td></tr></table></div>
+        <div class='section'>
+            <h2>6. Estruturas de Controlo Aninhadas</h2>
+            <p class='if-simp'>Total: 2</p>
+        </div>
+    
+        <div class='section'>
+            <h2>7. IFs simplificáveis</h2>
+            <p class='if-simp'>Total: 1</p>
+        </div>
+    </body></html>

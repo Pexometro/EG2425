@@ -1,0 +1,6 @@
+Int a = 5;
+Int a;              
+b = 10;             
+Int c;
+WRITE(c);           
+Int d = 0;          

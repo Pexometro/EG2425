@@ -1,17 +1,15 @@
-Int a = 5;
 Int b;
 b = 10;
-Array e;
-Int d;
 
-READ c;
 
-IF a > 0 THEN
-    WHILE b > 0 DO
-        IF c > 0 THEN
-            IF b > 0 THEN
-                WRITE "aninhado";
-            ENDIF
-        ENDIF
-    ENDWHILE
+IF b > 0 THEN
+    IF a < 0 THEN
+        WRITE "aninhado";
+    ENDIF
+    WRITE "OLA";
 ENDIF
+
+IF c < a THEN
+    WRITE "nao";
+ENDIF
+

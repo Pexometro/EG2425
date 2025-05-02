@@ -1,0 +1,73 @@
+
+    <html>
+    <head>
+        <title>Relatório de Análise</title>
+        <style>
+            body { background: #111; color: #eee; font-family: monospace; padding: 2em; }
+            h2 { color: #ff00cc; }
+            .section { margin-bottom: 3em; }
+            table { border-collapse: collapse; width: 100%; margin-top: 1em; }
+            th, td { border: 1px solid #444; padding: 8px; text-align: left; }
+            th { background: #222; color: #ff99ff; }
+            .error { color: #ff6666; }
+            .warn { color: #ffcc66; }
+            .if-simp { color: #66ffcc; }
+            pre { background: #1e1e1e; padding: 1em; overflow-x: auto; }
+        </style>
+    </head>
+    <body>
+        <h1>Relatório de Análise de Código</h1>
+
+        <div class="section">
+            <h2>1. Código Fonte</h2>
+            <pre><div class="highlight" style="background: #272822"><pre style="line-height: 125%;"><span></span><span style="color: #F8F8F2">Int</span> <span style="color: #F8F8F2">x</span> <span style="color: #FF4689">=</span> <span style="color: #AE81FF">1</span><span style="color: #F8F8F2">;</span>
+
+<span style="color: #F8F8F2">IF</span> <span style="color: #F8F8F2">x</span> <span style="color: #FF4689">&gt;</span> <span style="color: #AE81FF">0</span> <span style="color: #F8F8F2">THEN</span>
+  <span style="color: #F8F8F2">IF</span> <span style="color: #F8F8F2">x</span> <span style="color: #FF4689">&lt;</span> <span style="color: #AE81FF">10</span> <span style="color: #F8F8F2">THEN</span>
+    <span style="color: #F8F8F2">WRITE</span> <span style="color: #E6DB74">&quot;Entre 0 e 10&quot;</span><span style="color: #F8F8F2">;</span>
+  <span style="color: #F8F8F2">ENDIF</span>
+<span style="color: #F8F8F2">ENDIF</span>
+
+
+<span style="color: #F8F8F2">IF</span> <span style="color: #F8F8F2">x</span> <span style="color: #FF4689">&lt;</span> <span style="color: #AE81FF">0</span> <span style="color: #F8F8F2">THEN</span>
+    <span style="color: #F8F8F2">WRITE</span> <span style="color: #E6DB74">&quot;Não simplificavel&quot;</span><span style="color: #F8F8F2">;</span>
+<span style="color: #F8F8F2">ENDIF</span>
+</pre></div>
+</pre>
+        </div>
+
+        <div class="section">
+            <h2>2. Tabela de Símbolos</h2>
+            <table>
+                <tr><th>ID</th><th>Scope</th><th>Type</th></tr>
+    <tr><td>x</td><td>global</td><td>Int</td></tr>
+
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>3. Contagens</h2>
+            <ul>
+                <li>Declarações: 1</li>
+                <li>Atribuições: 0</li>
+                <li>Leitura/Escrita: 2</li>
+                <li>Condicionais: 3</li>
+                <li>Cíclicas: 0</li>
+                <li>Aninhamentos: 1</li>
+                <li>Ifs simplificáveis: 1</li>
+            </ul>
+        </div>
+    
+        <div class="section">
+            <h2>4. Erros e Warnings</h2>
+    </div><div class='section'><h2>5. Tipos</h2><table><tr><th>Tipo</th><th>Quantidade</th></tr><tr><td>Int</td><td>1</td></tr></table></div>
+        <div class='section'>
+            <h2>6. Estruturas de Controlo Aninhadas</h2>
+            <p class='if-simp'>Total: 1</p>
+        </div>
+    
+        <div class='section'>
+            <h2>7. IFs simplificáveis</h2>
+            <p class='if-simp'>Total: 1</p>
+        </div>
+    </body></html>
